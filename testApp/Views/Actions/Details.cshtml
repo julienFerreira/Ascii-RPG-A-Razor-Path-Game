@@ -1,0 +1,37 @@
+﻿@model testApp.Models.Action
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Action</h4>
+
+    <hr />
+    <div class="container">
+        <div class="card" ¨>
+            <div class="card-header">
+                <p>
+                    @Html.DisplayFor(model => model.ActionMessage)
+                </p>
+            </div>
+            <div class="card-body d-flex flex-row justify-content-around">
+                @if (Model.GetType().GetProperty("SuccessorMessage1") != null)
+                {
+                <a class="btn btn-outline-primary" asp-action="Details" asp-route-id="@Model.SuccessorCode1">
+                    @Html.DisplayFor(model => model.SuccessorMessage1)
+                </a>
+                <a class="btn btn-outline-primary" asp-action="Details" asp-route-id="@Model.SuccessorCode2">
+                    @Html.DisplayFor(model => model.SuccessorMessage2)
+                </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
