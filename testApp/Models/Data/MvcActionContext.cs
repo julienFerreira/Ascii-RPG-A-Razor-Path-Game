@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace testApp.Models.Data
+namespace ARPG.Models.Data
 {
     public class MvcActionContext : DbContext
     {

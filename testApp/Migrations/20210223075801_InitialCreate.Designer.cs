@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using testApp.Models.Data;
+using ARPG.Models.Data;
 
-namespace testApp.Migrations
+namespace ARPG.Migrations
 {
     [DbContext(typeof(MvcActionContext))]
     [Migration("20210223075801_InitialCreate")]
@@ -20,7 +20,7 @@ namespace testApp.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("testApp.Models.Action", b =>
+            modelBuilder.Entity("ARPG.Models.Action", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
