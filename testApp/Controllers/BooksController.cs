@@ -10,23 +10,22 @@ using ARPG.Models.Data;
 
 namespace ARPG.Controllers
 {
-    public class ActionsController : Controller
+    public class BooksController : Controller
     {
         private readonly ARPGContext _context;
 
-        public ActionsController(ARPGContext context)
+        public BooksController(ARPGContext context)
         {
             _context = context;
         }
 
-        // GET: Actions
+        // GET: Books
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Action.ToListAsync());
+            return View(await _context.Book.ToListAsync());
         }
 
-
-        // GET: Actions/Details/5
+        // GET: Books/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,39 +33,39 @@ namespace ARPG.Controllers
                 return NotFound();
             }
 
-            var action = await _context.Action
-                .FirstOrDefaultAsync(m => m.ActionNumber == id);
-            if (action == null)
+            var book = await _context.Book
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (book == null)
             {
                 return NotFound();
             }
 
-            return View(action);
+            return View(book);
         }
 
-        // GET: Actions/Create
+        // GET: Books/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Actions/Create
+        // POST: Books/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Models.Action actionCreated)
+        public async Task<IActionResult> Create([Bind("Id,Title,Description")] Book book)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(actionCreated);
+                _context.Add(book);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(actionCreated);
+            return View(book);
         }
 
-        // GET: Actions/Edit/5
+        // GET: Books/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -74,22 +73,22 @@ namespace ARPG.Controllers
                 return NotFound();
             }
 
-            var action = await _context.Action.FindAsync(id);
-            if (action == null)
+            var book = await _context.Book.FindAsync(id);
+            if (book == null)
             {
                 return NotFound();
             }
-            return View(action);
+            return View(book);
         }
 
-        // POST: Actions/Edit/5
+        // POST: Books/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Models.Action actionEdit)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description")] Book book)
         {
-            if (id != actionEdit.Id)
+            if (id != book.Id)
             {
                 return NotFound();
             }
@@ -98,12 +97,12 @@ namespace ARPG.Controllers
             {
                 try
                 {
-                    _context.Update(actionEdit);
+                    _context.Update(book);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ActionExists(actionEdit.Id))
+                    if (!BookExists(book.Id))
                     {
                         return NotFound();
                     }
@@ -113,11 +112,11 @@ namespace ARPG.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            } 
-            return View(actionEdit);
+            }
+            return View(book);
         }
 
-        // GET: Actions/Delete/5
+        // GET: Books/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -125,30 +124,30 @@ namespace ARPG.Controllers
                 return NotFound();
             }
 
-            var action = await _context.Action
+            var book = await _context.Book
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (action == null)
+            if (book == null)
             {
                 return NotFound();
             }
 
-            return View(action);
+            return View(book);
         }
 
-        // POST: Actions/Delete/5
+        // POST: Books/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var action = await _context.Action.FindAsync(id);
-            _context.Action.Remove(action);
+            var book = await _context.Book.FindAsync(id);
+            _context.Book.Remove(book);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ActionExists(int id)
+        private bool BookExists(int id)
         {
-            return _context.Action.Any(e => e.Id == id);
+            return _context.Book.Any(e => e.Id == id);
         }
     }
 }

@@ -8,7 +8,7 @@ using ARPG.Models.Data;
 
 namespace ARPG.Migrations
 {
-    [DbContext(typeof(MvcActionContext))]
+    [DbContext(typeof(ARPGContext))]
     [Migration("20210223075801_InitialCreate")]
     partial class InitialCreate
     {
