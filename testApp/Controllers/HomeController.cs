@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using testApp.Models;
+using ARPG.Models;
 
-namespace testApp.Controllers
+namespace ARPG.Controllers
 {
     public class HomeController : Controller
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace testApp.Models
+namespace ARPG.Models
 {
     public class ErrorViewModel
     {

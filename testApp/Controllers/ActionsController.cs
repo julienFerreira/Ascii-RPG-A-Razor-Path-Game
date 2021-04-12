@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using testApp.Models;
-using testApp.Models.Data;
+using ARPG.Models;
+using ARPG.Models.Data;
 
-namespace testApp.Controllers
+namespace ARPG.Controllers
 {
     public class ActionsController : Controller
     {

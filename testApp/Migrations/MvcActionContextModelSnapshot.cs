@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using testApp.Models.Data;
+using ARPG.Models.Data;
 
-namespace testApp.Migrations
+namespace ARPG.Migrations
 {
     [DbContext(typeof(MvcActionContext))]
     partial class MvcActionContextModelSnapshot : ModelSnapshot
@@ -18,7 +18,7 @@ namespace testApp.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("testApp.Models.Action", b =>
+            modelBuilder.Entity("ARPG.Models.Action", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

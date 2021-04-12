@@ -8,10 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using testApp.Models.Data;
+using ARPG.Models.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace testApp
+namespace ARPG
 {
     public class Startup
     {

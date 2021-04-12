@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace testApp.Migrations
+namespace ARPG.Migrations
 {
     public partial class InitialCreate : Migration
     {
