@@ -4,14 +4,16 @@ using ARPG.Models.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ARPG.Migrations
 {
     [DbContext(typeof(ARPGContext))]
-    partial class MvcActionContextModelSnapshot : ModelSnapshot
+    [Migration("20210419145349_AddHPGainsAndFkBooksInActions")]
+    partial class AddHPGainsAndFkBooksInActions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,7 +83,7 @@ namespace ARPG.Migrations
             modelBuilder.Entity("ARPG.Models.Action", b =>
                 {
                     b.HasOne("ARPG.Models.Book", "book")
-                        .WithMany("Actions")
+                        .WithMany()
                         .HasForeignKey("bookId");
                 });
 #pragma warning restore 612, 618

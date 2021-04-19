@@ -45,8 +45,9 @@ namespace ARPG.Controllers
         }
 
         // GET: Actions/Create
-        public IActionResult Create()
+        public IActionResult Create(int id)
         {
+            ViewBag.BookID = Request.Query["bookID"];
             return View();
         }
 

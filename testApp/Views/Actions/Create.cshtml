@@ -43,6 +43,15 @@
             </div>
 
             <div class="form-group">
+                <label class="control-label">Gains de HP : </label>
+                <input asp-for="HPGains" type="number" min="-10" max="10" step="1" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <input asp-for="book" type="hidden" class="form-control" value="@ViewBag.BookID" />
+            </div>
+
+            <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
