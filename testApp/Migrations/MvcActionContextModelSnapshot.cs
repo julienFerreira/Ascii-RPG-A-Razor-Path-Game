@@ -34,10 +34,10 @@ namespace ARPG.Migrations
 
                     b.Property<int>("BookId")
                         .HasColumnType("int");
-                    
+
                     b.HasOne("ARPG.Models.Book", "book")
                         .WithMany("Actions")
-                        .HasForeignKey("BookId")
+                        .HasForeignKey("BookId");
                         
                     b.Property<int>("HPGains")
                         .HasColumnType("int");
