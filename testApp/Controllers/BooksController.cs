@@ -53,6 +53,12 @@ namespace ARPG.Controllers
 
             var book = await _context.Book
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var user = await GetCurrentUserAsync();
+
+            if(book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
 
             await _context.Entry(book).Collection(b => b.Actions).LoadAsync();
             if (book == null)
@@ -99,6 +105,12 @@ namespace ARPG.Controllers
             }
 
             var book = await _context.Book.FindAsync(id);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             if (book == null)
             {
                 return NotFound();
@@ -117,6 +129,12 @@ namespace ARPG.Controllers
             if (id != book.Id)
             {
                 return NotFound();
+            }
+
+            var user = await GetCurrentUserAsync();
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
             }
 
             if (ModelState.IsValid)
@@ -153,6 +171,13 @@ namespace ARPG.Controllers
 
             var book = await _context.Book
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
+
             if (book == null)
             {
                 return NotFound();
@@ -167,7 +192,14 @@ namespace ARPG.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+
             var book = await _context.Book.FindAsync(id);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             _context.Book.Remove(book);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

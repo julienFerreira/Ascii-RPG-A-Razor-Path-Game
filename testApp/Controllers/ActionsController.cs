@@ -10,6 +10,8 @@ using ARPG.Models;
 using ARPG.Models.Data;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using ARPG.Areas.Identity;
 
 namespace ARPG.Controllers
 {
@@ -20,10 +22,13 @@ namespace ARPG.Controllers
         private readonly string finalMessageLoose = @"Sadly, you have no healthpoint left. 
                 You gather what courage you have left and leave without your dignity. Try again ?";
 
-        public ActionsController(ARPGContext context)
+        public ActionsController(ARPGContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
+        private readonly UserManager<User> _userManager;
+        private Task<User> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
 
         // GET: Actions/Details/5
@@ -38,6 +43,13 @@ namespace ARPG.Controllers
 
             var action = await _context.Action
                 .FirstOrDefaultAsync(m => (m.ActionNumber == actionNumber && m.BookId == bookId));
+            var user = await GetCurrentUserAsync();
+
+            if (action.Book.User.Id != user.Id)
+            {
+                return Unauthorized();
+            }
+
             if (action == null)
             {
                 return NotFound();
@@ -83,9 +95,18 @@ namespace ARPG.Controllers
 
         // GET: Actions/Create
         [Authorize]
-        public IActionResult Create(int id)
+        public async Task<ActionResult> Create(int id)
         {
+
             ViewBag.BookID = Request.Query["bookID"];
+            int bookId = ViewBag.BookID;
+            var book = await _context.Book.FirstAsync(b => b.Id == bookId);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             return View();
         }
 
@@ -101,6 +122,13 @@ namespace ARPG.Controllers
             {
                 _context.Add(actionCreated);
                 var book = await _context.Book.FirstAsync(b => b.Id == bookID);
+                var user = await GetCurrentUserAsync();
+
+                if (book.User?.Id != user.Id)
+                {
+                    return Unauthorized();
+                }
+
                 actionCreated.Book = book;
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(BooksController.Details), new RouteValueDictionary(
@@ -124,6 +152,14 @@ namespace ARPG.Controllers
             }
 
             var action = await _context.Action.FindAsync(id);
+            var book = await _context.Book.FindAsync(action.BookId);
+            _context.Entry(book).Reference(b => b.User);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             if (action == null)
             {
                 return NotFound();
@@ -139,6 +175,12 @@ namespace ARPG.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Models.Action actionEdit)
         {
+            var user = await GetCurrentUserAsync();
+
+            if (actionEdit.Book.User.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             if (id != actionEdit.Id)
             {
                 return NotFound();
@@ -189,6 +231,14 @@ namespace ARPG.Controllers
 
             var action = await _context.Action
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var book = await _context.Book.FindAsync(action.BookId);
+            _context.Entry(book).Reference(b => b.User);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             if (action == null)
             {
                 return NotFound();
@@ -204,6 +254,12 @@ namespace ARPG.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var action = await _context.Action.FindAsync(id);
+            var user = await GetCurrentUserAsync();
+
+            if (action.Book.User.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             _context.Action.Remove(action);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
