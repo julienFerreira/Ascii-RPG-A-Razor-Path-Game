@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using ARPG.Models;
 using ARPG.Models.Data;
 
@@ -13,11 +14,13 @@ namespace ARPG.Controllers
     public class ActionsController : Controller
     {
         private readonly ARPGContext _context;
+        private readonly int BASE_HEALTHPOINT = 50;
 
         public ActionsController(ARPGContext context)
         {
             _context = context;
         }
+        
 
         // GET: Actions
         public async Task<IActionResult> Index()
@@ -41,6 +44,12 @@ namespace ARPG.Controllers
                 return NotFound();
             }
 
+            //Get HP from session, default at base healthpoint
+            int healthPoint = HttpContext.Session.GetInt32("hp") ?? BASE_HEALTHPOINT;
+            healthPoint += -1;//TODO LINK TO ACTION HEALTH
+            HttpContext.Session.SetInt32("hp", healthPoint);
+
+            ViewBag.hp = healthPoint;
             return View(action);
         }
 
