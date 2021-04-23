@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ARPG.Areas.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,5 +19,8 @@ namespace ARPG.Models
         public bool IsValid { get; set; }
 
         public ICollection<Action> Actions { get; set; }
+
+        public int UserId { get; set; } 
+        public User User { get; set; }
     }
 }

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ARPG.Migrations
 {
     [DbContext(typeof(ARPGContext))]
-    [Migration("20210423093717_AddLogin")]
-    partial class AddLogin
+    [Migration("20210423153210_AddFkBetweenUsersAndBooks")]
+    partial class AddFkBetweenUsersAndBooks
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -34,6 +34,15 @@ namespace ARPG.Migrations
                     b.Property<int>("ActionNumber")
                         .HasColumnType("int");
 
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HPGains")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("IsWon")
+                        .HasColumnType("bit");
+
                     b.Property<int>("SuccessorCode1")
                         .HasColumnType("int");
 
@@ -47,6 +56,8 @@ namespace ARPG.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookId");
 
                     b.ToTable("Action");
                 });
@@ -67,7 +78,15 @@ namespace ARPG.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId1")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("Book");
                 });
@@ -135,6 +154,10 @@ namespace ARPG.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
@@ -186,6 +209,8 @@ namespace ARPG.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -270,6 +295,29 @@ namespace ARPG.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("ARPG.Areas.Identity.User", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.HasDiscriminator().HasValue("User");
+                });
+
+            modelBuilder.Entity("ARPG.Models.Action", b =>
+                {
+                    b.HasOne("ARPG.Models.Book", "Book")
+                        .WithMany("Actions")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ARPG.Models.Book", b =>
+                {
+                    b.HasOne("ARPG.Areas.Identity.User", "User")
+                        .WithMany("Books")
+                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

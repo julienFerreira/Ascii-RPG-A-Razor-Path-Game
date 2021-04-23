@@ -18,7 +18,7 @@ namespace ARPG.Areas.Identity
                 services.AddDbContext<ARPGContext>(options =>
                 options.UseSqlServer(
                     context.Configuration.GetConnectionString("ARPGContext")));
-                services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
                   .AddEntityFrameworkStores<ARPGContext>();
             });
         }
