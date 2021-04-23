@@ -17,10 +17,10 @@ namespace ARPG.Models
         public int ActionNumber { get; set; }
         public string ActionMessage { get; set; }
         public string SuccessorMessage1 { get; set; }
-        public int SuccessorCode1 { get; set; }
+        public int? SuccessorCode1 { get; set; }
         public string SuccessorMessage2 { get; set; }
-        public int SuccessorCode2 { get; set; }
-        public int HPGains { get; set; }
+        public int? SuccessorCode2 { get; set; }
+        public int? HPGains { get; set; }
         public bool? IsWon {get; set;}
     }
 }

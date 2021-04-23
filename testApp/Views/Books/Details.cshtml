@@ -7,8 +7,36 @@
 <h1>Details</h1>
 
 <p>
-    <a class="btn btn-outline-success" asp-controller="Actions"  asp-action="Create"  asp-route-bookID="@Model.Id">Add new Action</a>
+    <a class="btn btn-outline-success" asp-controller="Actions" asp-action="Create" asp-route-bookID="@Model.Id">Add new Action</a>
+    <a class="btn btn-outline-success" asp-action="Validate" asp-route-id="@Model.Id">Validate</a> |
 </p>
+
+
+@if (ViewBag.validated != null)
+{
+    <p class="@(ViewBag.validated ? "text-success" : "text-danger" )">
+        Book validated : @(ViewBag.validated ? "Yes !" : "No, check the errors" )
+    </p>
+
+}
+@if (ViewBag.warnings != null)
+{
+    foreach (var warning in ViewBag.warnings)
+    {
+        <p class="alert-warning">
+            @warning
+        </p>
+    }
+}
+@if (ViewBag.errors != null)
+{
+    foreach (var error in ViewBag.errors)
+    {
+        <p class="alert-danger">
+            @error
+        </p>
+    }
+}
 
 <div>
     <h4>Book</h4>
@@ -52,38 +80,39 @@
             </th>
         </tr>
     </thead>
-    @if (Model.Actions != null) {
-<tbody>
-    @foreach (var item in Model.Actions)
+    @if (Model.Actions != null)
     {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ActionMessage)
-                <div class="badge badge-secondary float-right">
-                    @Html.DisplayFor(modelItem => item.ActionNumber)
-                </div>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SuccessorMessage1)
-                <div class="badge badge-secondary float-right">
-                    @Html.DisplayFor(modelItem => item.SuccessorCode1)
-                </div>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SuccessorMessage2)
-                <div class="badge badge-secondary float-right">
-                    @Html.DisplayFor(modelItem => item.SuccessorCode2)
-                </div>
-            </td>
-            <td>
-                <a class="btn btn-outline-primary" asp-controller="Actions" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a class="btn btn-outline-danger" asp-controller="Actions" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+        <tbody>
+            @foreach (var item in Model.Actions)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ActionMessage)
+                        <div class="badge badge-secondary float-right">
+                            @Html.DisplayFor(modelItem => item.ActionNumber)
+                        </div>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SuccessorMessage1)
+                        <div class="badge badge-secondary float-right">
+                            @Html.DisplayFor(modelItem => item.SuccessorCode1)
+                        </div>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SuccessorMessage2)
+                        <div class="badge badge-secondary float-right">
+                            @Html.DisplayFor(modelItem => item.SuccessorCode2)
+                        </div>
+                    </td>
+                    <td>
+                        <a class="btn btn-outline-primary" asp-controller="Actions" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a class="btn btn-outline-danger" asp-controller="Actions" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
     }
-</tbody>
-    }
-    
+
 </table>
 
 
