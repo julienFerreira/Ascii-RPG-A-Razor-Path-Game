@@ -122,7 +122,15 @@ namespace ARPG.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                //return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(BooksController.Details), new RouteValueDictionary(
+                     new
+                     {
+                         controller = "Books",
+                         action = nameof(BooksController.Details),
+                         Id = actionEdit.BookId
+                     }
+                     ));
             } 
             return View(actionEdit);
         }

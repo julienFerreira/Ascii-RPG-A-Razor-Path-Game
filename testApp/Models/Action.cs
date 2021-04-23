@@ -9,9 +9,9 @@ namespace ARPG.Models
     {
         public Action() { }
 
-        
+
         public int Id { get; set; }
-        
+
         public int BookId { get; set; }
         public Book book { get; set; }
         public int ActionNumber { get; set; }
@@ -22,5 +22,6 @@ namespace ARPG.Models
         public int SuccessorCode2 { get; set; }
         public int HPGains { get; set; }
 
+        public bool? isWon {get; set;}
     }
 }
