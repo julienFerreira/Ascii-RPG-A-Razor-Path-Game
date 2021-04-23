@@ -7,14 +7,8 @@ namespace ARPG.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "UserId",
-                table: "Book",
-                nullable: false,
-                defaultValue: 0);
-
             migrationBuilder.AddColumn<string>(
-                name: "UserId1",
+                name: "UserId",
                 table: "Book",
                 nullable: true);
 
@@ -50,8 +44,7 @@ namespace ARPG.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false),
-                    Discriminator = table.Column<string>(nullable: false)
+                    AccessFailedCount = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -165,9 +158,9 @@ namespace ARPG.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Book_UserId1",
+                name: "IX_Book_UserId",
                 table: "Book",
-                column: "UserId1");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -209,9 +202,9 @@ namespace ARPG.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Book_AspNetUsers_UserId1",
+                name: "FK_Book_AspNetUsers_UserId",
                 table: "Book",
-                column: "UserId1",
+                column: "UserId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
@@ -220,7 +213,7 @@ namespace ARPG.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Book_AspNetUsers_UserId1",
+                name: "FK_Book_AspNetUsers_UserId",
                 table: "Book");
 
             migrationBuilder.DropTable(
@@ -245,15 +238,11 @@ namespace ARPG.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropIndex(
-                name: "IX_Book_UserId1",
+                name: "IX_Book_UserId",
                 table: "Book");
 
             migrationBuilder.DropColumn(
                 name: "UserId",
-                table: "Book");
-
-            migrationBuilder.DropColumn(
-                name: "UserId1",
                 table: "Book");
         }
     }

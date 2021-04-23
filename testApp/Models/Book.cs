@@ -20,7 +20,6 @@ namespace ARPG.Models
 
         public ICollection<Action> Actions { get; set; }
 
-        public int UserId { get; set; } 
         public User User { get; set; }
     }
 }

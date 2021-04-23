@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ARPG.Models;
 using ARPG.Models.Data;
-
+using Microsoft.AspNetCore.Identity;
+using ARPG.Areas.Identity;
 
 namespace ARPG.Controllers
 {
@@ -15,16 +16,25 @@ namespace ARPG.Controllers
     {
         private readonly ARPGContext _context;
 
-        public BooksController(ARPGContext context)
+        public BooksController(ARPGContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
+
+        private readonly UserManager<User> _userManager;
+        private Task<User> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
+       
 
         // GET: Books
         public async Task<IActionResult> Index()
         {
-            
-            return View(await _context.Book.ToListAsync());
+
+            var user = await GetCurrentUserAsync();
+            await _context.Entry(user).Collection(u => u.Books).LoadAsync();
+
+            return View(user.Books);
+            //return View(await _context.Book.ToListAsync());
         }
 
         // GET: Books/Details/5
@@ -62,6 +72,8 @@ namespace ARPG.Controllers
         {
             if (ModelState.IsValid)
             {
+                var user = await GetCurrentUserAsync();
+                book.User = user;
                 _context.Add(book);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
