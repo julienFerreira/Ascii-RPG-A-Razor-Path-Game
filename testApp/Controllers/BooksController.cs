@@ -24,8 +24,13 @@ namespace ARPG.Controllers
 
         private readonly UserManager<User> _userManager;
         private Task<User> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
-       
 
+        // GET : Library
+        public async Task<IActionResult> Library()
+        {
+            var books = _context.Book.Where(b => b.IsValid);
+            return View(books);
+        }
         // GET: Books
         public async Task<IActionResult> Index()
         {
@@ -34,7 +39,6 @@ namespace ARPG.Controllers
             await _context.Entry(user).Collection(u => u.Books).LoadAsync();
 
             return View(user.Books);
-            //return View(await _context.Book.ToListAsync());
         }
 
         // GET: Books/Details/5

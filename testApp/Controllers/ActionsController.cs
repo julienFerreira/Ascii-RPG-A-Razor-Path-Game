@@ -23,18 +23,19 @@ namespace ARPG.Controllers
         {
             _context = context;
         }
-        
+
 
         // GET: Actions/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [HttpGet("Books/{bookId}/Actions/{actionNumber}")]
+        public async Task<IActionResult> Details([FromRoute]int? bookId, [FromRoute]int? actionNumber)
         {
-            if (id == null)
+            if (actionNumber == null || bookId == null)
             {
                 return NotFound();
             }
 
             var action = await _context.Action
-                .FirstOrDefaultAsync(m => m.ActionNumber == id);
+                .FirstOrDefaultAsync(m => (m.ActionNumber == actionNumber && m.BookId == bookId));
             if (action == null)
             {
                 return NotFound();
@@ -51,7 +52,7 @@ namespace ARPG.Controllers
 
             //Get HP from session, default at base healthpoint
             int healthPoint;
-            if (id == 1)
+            if (actionNumber == 1)
             {
                 //Fist view of a book - the first page always go to max hitpoints
                 healthPoint = BASE_HEALTHPOINT;
