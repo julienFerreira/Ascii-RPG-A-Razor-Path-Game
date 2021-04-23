@@ -16,5 +16,7 @@ namespace ARPG.Models
         public string Description { get; set; }
 
         public bool IsValid { get; set; }
+
+        public ICollection<Action> Actions { get; set; }
     }
 }

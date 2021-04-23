@@ -32,6 +32,16 @@ namespace ARPG.Migrations
                     b.Property<int>("ActionNumber")
                         .HasColumnType("int");
 
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.HasOne("ARPG.Models.Book", "book")
+                        .WithMany("Actions")
+                        .HasForeignKey("BookId");
+                        
+                    b.Property<int>("HPGains")
+                        .HasColumnType("int");
+
                     b.Property<int>("SuccessorCode1")
                         .HasColumnType("int");
 
@@ -44,7 +54,12 @@ namespace ARPG.Migrations
                     b.Property<string>("SuccessorMessage2")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("isWon")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("BookId");
 
                     b.ToTable("Action");
                 });
@@ -317,6 +332,7 @@ namespace ARPG.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

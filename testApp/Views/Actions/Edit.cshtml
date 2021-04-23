@@ -42,6 +42,20 @@
             </div>
 
             <div class="form-group">
+                <label class="control-label">Gains de HP : </label>
+                <input asp-for="HPGains" type="number" min="-10" max="10" step="1" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Gains de HP : </label>
+                <select asp-for="isWon">
+                    <option value="@null" selected>No terminal</option>
+                    <option value="@true">Win</option>
+                    <option value="@false">Loose</option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <input type="submit" value="Edit" class="btn btn-primary" />
             </div>
         </form>
@@ -49,7 +63,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-controller="Books" asp-action="Details" asp-route-id="@Model.BookId">Back to List</a>
 </div>
 
 @section Scripts {

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ARPG.Models;
 using ARPG.Models.Data;
 
+
 namespace ARPG.Controllers
 {
     public class BooksController : Controller
@@ -22,6 +23,7 @@ namespace ARPG.Controllers
         // GET: Books
         public async Task<IActionResult> Index()
         {
+            
             return View(await _context.Book.ToListAsync());
         }
 
@@ -35,11 +37,13 @@ namespace ARPG.Controllers
 
             var book = await _context.Book
                 .FirstOrDefaultAsync(m => m.Id == id);
+
+            await _context.Entry(book).Collection(b => b.Actions).LoadAsync();
             if (book == null)
             {
                 return NotFound();
             }
-
+            
             return View(book);
         }
 
