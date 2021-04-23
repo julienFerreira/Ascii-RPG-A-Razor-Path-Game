@@ -56,19 +56,28 @@ namespace ARPG.Controllers
                 healthPoint = BASE_HEALTHPOINT;
             } else {
                 healthPoint = HttpContext.Session.GetInt32("hp") ?? BASE_HEALTHPOINT;
-                healthPoint += -1;//TODO LINK TO ACTION HEALTH
+                healthPoint += action.HPGains;//TODO LINK TO ACTION HEALTH
+                if (healthPoint > BASE_HEALTHPOINT)
+                    healthPoint = BASE_HEALTHPOINT;
 
                 //Check if the user is below 0 hitpoints
                 if (healthPoint <= 0)
                 {
+                    ViewBag.win = false;
                     return View("End");
                 }
+            }
+
+            if(action.IsWon != null)
+            {
+                ViewBag.win = action.IsWon;
+                return View("End");
             }
 
             HttpContext.Session.SetInt32("hp", healthPoint);
 
             ViewBag.hp = healthPoint;
-            ViewBag.max-hp = BASE_HEALTHPOINT;
+            ViewBag.maxHP = BASE_HEALTHPOINT;
             return View(action);
         }
 
@@ -90,7 +99,7 @@ namespace ARPG.Controllers
             {
                 _context.Add(actionCreated);
                 var book = await _context.Book.FirstAsync(b => b.Id == bookID);
-                actionCreated.book = book;
+                actionCreated.Book = book;
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(BooksController.Details), new RouteValueDictionary(
                      new { 
@@ -135,6 +144,9 @@ namespace ARPG.Controllers
             {
                 try
                 {
+                    var action = await _context.Action.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+                    //replace unchangable parameters
+                    actionEdit.BookId = action.BookId;
                     _context.Update(actionEdit);
                     await _context.SaveChangesAsync();
                 }

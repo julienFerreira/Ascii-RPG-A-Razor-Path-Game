@@ -7,9 +7,16 @@
 <h1>End</h1>
 
 <div>
-    <h4>END YOO</h4>
+    @if (ViewBag.win != null && ViewBag.win)
+    {
+        <h4>Won</h4>
+    }
+    else
+    {
+        <h4>Lost</h4>
+    }
     <hr />
-    
+
 </div>
 <div>
     <a asp-action="Index">Back to Books</a>
