@@ -4,14 +4,16 @@ using ARPG.Models.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ARPG.Migrations
 {
     [DbContext(typeof(ARPGContext))]
-    partial class MvcActionContextModelSnapshot : ModelSnapshot
+    [Migration("20210423093717_AddLogin")]
+    partial class AddLogin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,19 +34,6 @@ namespace ARPG.Migrations
                     b.Property<int>("ActionNumber")
                         .HasColumnType("int");
 
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
-
-                    b.HasOne("ARPG.Models.Book", "book")
-                        .WithMany("Actions")
-                        .HasForeignKey("BookId");
-
-                    b.Property<int>("HPGains")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("IsWon")
-                        .HasColumnType("bit");
-
                     b.Property<int>("SuccessorCode1")
                         .HasColumnType("int");
 
@@ -58,8 +47,6 @@ namespace ARPG.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BookId");
 
                     b.ToTable("Action");
                 });

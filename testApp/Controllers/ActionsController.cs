@@ -23,13 +23,6 @@ namespace ARPG.Controllers
         }
         
 
-        // GET: Actions
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Action.ToListAsync());
-        }
-
-
         // GET: Actions/Details/5
         public async Task<IActionResult> Details(int? id)
         {
