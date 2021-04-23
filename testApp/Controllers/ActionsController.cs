@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ARPG.Models;
 using ARPG.Models.Data;
+using Microsoft.AspNetCore.Routing;
 
 namespace ARPG.Controllers
 {
@@ -56,15 +57,23 @@ namespace ARPG.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Models.Action actionCreated)
+        public async Task<IActionResult> Create(Models.Action actionCreated,int bookID)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(actionCreated);
+                var book = await _context.Book.FirstAsync(b => b.Id == bookID);
+                actionCreated.book = book;
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(BooksController.Details), new RouteValueDictionary(
+                     new { 
+                         controller = "Books", 
+                         action = nameof(BooksController.Details), 
+                         Id = bookID }
+                     ));
             }
             return View(actionCreated);
+
         }
 
         // GET: Actions/Edit/5

@@ -11,6 +11,8 @@ namespace ARPG.Models
 
         
         public int Id { get; set; }
+        
+        public int BookId { get; set; }
         public Book book { get; set; }
         public int ActionNumber { get; set; }
         public string ActionMessage { get; set; }

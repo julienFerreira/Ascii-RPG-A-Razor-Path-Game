@@ -14,5 +14,15 @@ namespace ARPG.Models.Data
         }
         public DbSet<Action> Action { get; set; }
         public DbSet<Book> Book { get; set; }
+
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<Action>()
+        //        .HasOne(a => a.book)
+        //        .WithMany(b => b.Actions)
+        //        .HasForeignKey(a => a.BookId)
+        //        .HasConstraintName("ForeignKey_Actions_Book");
+        //}
+
     }
 }
