@@ -14,7 +14,7 @@ namespace ARPG.Controllers
     public class ActionsController : Controller
     {
         private readonly ARPGContext _context;
-        private readonly int BASE_HEALTHPOINT = 50;
+        private readonly int BASE_HEALTHPOINT = 10;
 
         public ActionsController(ARPGContext context)
         {
@@ -44,12 +44,30 @@ namespace ARPG.Controllers
                 return NotFound();
             }
 
+            //See if the action is terminal
+
+
             //Get HP from session, default at base healthpoint
-            int healthPoint = HttpContext.Session.GetInt32("hp") ?? BASE_HEALTHPOINT;
-            healthPoint += -1;//TODO LINK TO ACTION HEALTH
+            int healthPoint;
+            if (id == 1)
+            {
+                //Fist view of a book - the first page always go to max hitpoints
+                healthPoint = BASE_HEALTHPOINT;
+            } else {
+                healthPoint = HttpContext.Session.GetInt32("hp") ?? BASE_HEALTHPOINT;
+                healthPoint += -1;//TODO LINK TO ACTION HEALTH
+
+                //Check if the user is below 0 hitpoints
+                if (healthPoint <= 0)
+                {
+                    return View("End");
+                }
+            }
+
             HttpContext.Session.SetInt32("hp", healthPoint);
 
             ViewBag.hp = healthPoint;
+            ViewBag.max-hp = BASE_HEALTHPOINT;
             return View(action);
         }
 
