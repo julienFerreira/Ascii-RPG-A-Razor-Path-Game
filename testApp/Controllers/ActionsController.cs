@@ -16,6 +16,8 @@ namespace ARPG.Controllers
     {
         private readonly ARPGContext _context;
         private readonly int BASE_HEALTHPOINT = 10;
+        private readonly string finalMessageLoose = @"Sadly, you have no healthpoint left. 
+                You gather what courage you have left and leave without your dignity. Try again ?";
 
         public ActionsController(ARPGContext context)
         {
@@ -38,8 +40,14 @@ namespace ARPG.Controllers
                 return NotFound();
             }
 
-            //See if the action is terminal
-
+            //Check if action is terminal
+            if (action.IsWon != null)
+            {
+                ViewBag.bookId = action.BookId;
+                ViewBag.win = action.IsWon;
+                ViewBag.message = action.ActionMessage;
+                return View("End");
+            }
 
             //Get HP from session, default at base healthpoint
             int healthPoint;
@@ -56,15 +64,11 @@ namespace ARPG.Controllers
                 //Check if the user is below 0 hitpoints
                 if (healthPoint <= 0)
                 {
+                    ViewBag.bookId = action.BookId;
+                    ViewBag.message = finalMessageLoose;
                     ViewBag.win = false;
                     return View("End");
                 }
-            }
-
-            if(action.IsWon != null)
-            {
-                ViewBag.win = action.IsWon;
-                return View("End");
             }
 
             HttpContext.Session.SetInt32("hp", healthPoint);
