@@ -33,11 +33,18 @@ namespace ARPG
             services.AddAuthentication()
                 .AddGoogle(options =>
                 {
-                    IConfigurationSection googleAuthNSection =
-                        Configuration.GetSection("Authentication:Google");
+                    IConfigurationSection googleAuthNSection = Configuration.GetSection("Authentication:Google");
 
                     options.ClientId = googleAuthNSection["ClientId"];
                     options.ClientSecret = googleAuthNSection["ClientSecret"];
+                })
+                .AddGitHub(options =>
+                {
+                    IConfigurationSection githubAuthNSection = Configuration.GetSection("Authentication:Github");
+
+                    options.ClientId = githubAuthNSection["ClientId"];
+                    options.ClientSecret = githubAuthNSection["ClientSecret"];
+
                 });
         }
 
