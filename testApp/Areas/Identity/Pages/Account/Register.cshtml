@@ -51,7 +51,14 @@
                             <p>
                                 @foreach (var provider in Model.ExternalLogins)
                                 {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                    if (provider.DisplayName == "Google")
+                                    {
+                                        <button type="submit" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account" class="btn btn-lg btn-google btn-block  btn-outline" href="#"><img src="https://img.icons8.com/color/16/000000/google-logo.png"> Register with @provider.DisplayName </button>
+                                    }
+                                    if (provider.DisplayName == "GitHub")
+                                    {
+                                        <button type="submit" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account" class="btn btn-lg btn-google btn-block  btn-outline" href="#"><img src="https://www.freepnglogos.com/uploads/512x512-logo-png/512x512-logo-github-icon-35.png" width="20" alt=""> Register with @provider.Name</button>
+                                    }
                                 }
                             </p>
                         </div>
