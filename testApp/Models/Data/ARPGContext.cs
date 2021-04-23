@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ARPG.Models.Data
 {
-    public class ARPGContext : DbContext
+    public class ARPGContext : IdentityDbContext<IdentityUser>
     {
         public ARPGContext(DbContextOptions<ARPGContext> options)
             : base(options)
