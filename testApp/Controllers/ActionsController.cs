@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using ARPG.Models;
 using ARPG.Models.Data;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ARPG.Controllers
 {
@@ -26,6 +27,7 @@ namespace ARPG.Controllers
 
 
         // GET: Actions/Details/5
+        [Authorize]
         [HttpGet("Books/{bookId}/Actions/{actionNumber}")]
         public async Task<IActionResult> Details([FromRoute]int? bookId, [FromRoute]int? actionNumber)
         {
@@ -80,6 +82,7 @@ namespace ARPG.Controllers
         }
 
         // GET: Actions/Create
+        [Authorize]
         public IActionResult Create(int id)
         {
             ViewBag.BookID = Request.Query["bookID"];
@@ -89,6 +92,7 @@ namespace ARPG.Controllers
         // POST: Actions/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Models.Action actionCreated,int bookID)
@@ -111,6 +115,7 @@ namespace ARPG.Controllers
         }
 
         // GET: Actions/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -129,6 +134,7 @@ namespace ARPG.Controllers
         // POST: Actions/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Models.Action actionEdit)
@@ -173,6 +179,7 @@ namespace ARPG.Controllers
         }
 
         // GET: Actions/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -191,6 +198,7 @@ namespace ARPG.Controllers
         }
 
         // POST: Actions/Delete/5
+        [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

@@ -9,6 +9,7 @@ using ARPG.Models;
 using ARPG.Models.Data;
 using Microsoft.AspNetCore.Identity;
 using ARPG.Areas.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ARPG.Controllers
 {
@@ -32,6 +33,7 @@ namespace ARPG.Controllers
             return View(books);
         }
         // GET: Books
+        [Authorize]
         public async Task<IActionResult> Index()
         {
 
@@ -40,7 +42,7 @@ namespace ARPG.Controllers
 
             return View(user.Books);
         }
-
+        [Authorize]
         // GET: Books/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -62,6 +64,7 @@ namespace ARPG.Controllers
         }
 
         // GET: Books/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -70,6 +73,7 @@ namespace ARPG.Controllers
         // POST: Books/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Description,IsValid")] Book book)
@@ -86,6 +90,7 @@ namespace ARPG.Controllers
         }
 
         // GET: Books/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -104,6 +109,7 @@ namespace ARPG.Controllers
         // POST: Books/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,IsValid")] Book book)
@@ -137,6 +143,7 @@ namespace ARPG.Controllers
         }
 
         // GET: Books/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -156,6 +163,7 @@ namespace ARPG.Controllers
 
         // POST: Books/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
