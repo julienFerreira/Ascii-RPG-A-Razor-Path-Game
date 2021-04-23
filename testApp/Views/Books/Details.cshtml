@@ -6,30 +6,87 @@
 
 <h1>Details</h1>
 
+<p>
+    <a class="btn btn-outline-success" asp-controller="Actions"  asp-action="Create"  asp-route-bookID="@Model.Id">Add new Action</a>
+</p>
+
 <div>
     <h4>Book</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Title)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Title)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.IsValid)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.IsValid)
         </dd>
     </dl>
 </div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Action
+            </th>
+            <th>
+                Successor 1
+            </th>
+            <th>
+                Successor 2
+            </th>
+            <th>
+                Manage
+            </th>
+        </tr>
+    </thead>
+    @if (Model.Actions != null) {
+<tbody>
+    @foreach (var item in Model.Actions)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ActionMessage)
+                <div class="badge badge-secondary float-right">
+                    @Html.DisplayFor(modelItem => item.ActionNumber)
+                </div>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SuccessorMessage1)
+                <div class="badge badge-secondary float-right">
+                    @Html.DisplayFor(modelItem => item.SuccessorCode1)
+                </div>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SuccessorMessage2)
+                <div class="badge badge-secondary float-right">
+                    @Html.DisplayFor(modelItem => item.SuccessorCode2)
+                </div>
+            </td>
+            <td>
+                <a class="btn btn-outline-primary" asp-controller="Actions" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a class="btn btn-outline-danger" asp-controller="Actions" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+    }
+</tbody>
+    }
+    
+</table>
+
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

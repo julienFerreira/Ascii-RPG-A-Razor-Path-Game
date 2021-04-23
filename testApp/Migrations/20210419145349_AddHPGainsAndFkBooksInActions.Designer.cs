@@ -4,14 +4,16 @@ using ARPG.Models.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ARPG.Migrations
 {
     [DbContext(typeof(ARPGContext))]
-    partial class MvcActionContextModelSnapshot : ModelSnapshot
+    [Migration("20210419145349_AddHPGainsAndFkBooksInActions")]
+    partial class AddHPGainsAndFkBooksInActions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,9 +34,6 @@ namespace ARPG.Migrations
                     b.Property<int>("ActionNumber")
                         .HasColumnType("int");
 
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
-
                     b.Property<int>("HPGains")
                         .HasColumnType("int");
 
@@ -50,12 +49,12 @@ namespace ARPG.Migrations
                     b.Property<string>("SuccessorMessage2")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isWon")
-                        .HasColumnType("bit");
+                    b.Property<int?>("bookId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookId");
+                    b.HasIndex("bookId");
 
                     b.ToTable("Action");
                 });
@@ -84,10 +83,8 @@ namespace ARPG.Migrations
             modelBuilder.Entity("ARPG.Models.Action", b =>
                 {
                     b.HasOne("ARPG.Models.Book", "book")
-                        .WithMany("Actions")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("bookId");
                 });
 #pragma warning restore 612, 618
         }
