@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using ARPG.Models;
 using ARPG.Models.Data;
 using Microsoft.AspNetCore.Routing;
@@ -14,11 +15,15 @@ namespace ARPG.Controllers
     public class ActionsController : Controller
     {
         private readonly ARPGContext _context;
+        private readonly int BASE_HEALTHPOINT = 10;
+        private readonly string finalMessageLoose = @"Sadly, you have no healthpoint left. 
+                You gather what courage you have left and leave without your dignity. Try again ?";
 
         public ActionsController(ARPGContext context)
         {
             _context = context;
         }
+        
 
         // GET: Actions/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -35,6 +40,41 @@ namespace ARPG.Controllers
                 return NotFound();
             }
 
+            //Check if action is terminal
+            if (action.IsWon != null)
+            {
+                ViewBag.bookId = action.BookId;
+                ViewBag.win = action.IsWon;
+                ViewBag.message = action.ActionMessage;
+                return View("End");
+            }
+
+            //Get HP from session, default at base healthpoint
+            int healthPoint;
+            if (id == 1)
+            {
+                //Fist view of a book - the first page always go to max hitpoints
+                healthPoint = BASE_HEALTHPOINT;
+            } else {
+                healthPoint = HttpContext.Session.GetInt32("hp") ?? BASE_HEALTHPOINT;
+                healthPoint += action.HPGains;//TODO LINK TO ACTION HEALTH
+                if (healthPoint > BASE_HEALTHPOINT)
+                    healthPoint = BASE_HEALTHPOINT;
+
+                //Check if the user is below 0 hitpoints
+                if (healthPoint <= 0)
+                {
+                    ViewBag.bookId = action.BookId;
+                    ViewBag.message = finalMessageLoose;
+                    ViewBag.win = false;
+                    return View("End");
+                }
+            }
+
+            HttpContext.Session.SetInt32("hp", healthPoint);
+
+            ViewBag.hp = healthPoint;
+            ViewBag.maxHP = BASE_HEALTHPOINT;
             return View(action);
         }
 
@@ -56,7 +96,7 @@ namespace ARPG.Controllers
             {
                 _context.Add(actionCreated);
                 var book = await _context.Book.FirstAsync(b => b.Id == bookID);
-                actionCreated.book = book;
+                actionCreated.Book = book;
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(BooksController.Details), new RouteValueDictionary(
                      new { 
@@ -101,6 +141,9 @@ namespace ARPG.Controllers
             {
                 try
                 {
+                    var action = await _context.Action.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+                    //replace unchangable parameters
+                    actionEdit.BookId = action.BookId;
                     _context.Update(actionEdit);
                     await _context.SaveChangesAsync();
                 }
