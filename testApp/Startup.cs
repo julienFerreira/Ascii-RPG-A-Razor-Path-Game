@@ -26,6 +26,7 @@ namespace ARPG
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddSession();
 
             services.AddDbContext<ARPGContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("ARPGContext")));
@@ -44,6 +45,8 @@ namespace ARPG
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseSession();
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
