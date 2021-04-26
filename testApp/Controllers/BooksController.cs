@@ -130,9 +130,10 @@ namespace ARPG.Controllers
             {
                 return NotFound();
             }
-
+            var currentBook = await _context.Book.AsNoTracking().Include(b=>b.User).FirstAsync(b => book.Id==b.Id );
+            //_context.Entry(currentBook).Reference(b => b.User);
             var user = await GetCurrentUserAsync();
-            if (book.User?.Id != user.Id)
+            if (currentBook.User?.Id != user.Id)
             {
                 return Unauthorized();
             }

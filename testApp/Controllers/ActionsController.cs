@@ -99,8 +99,9 @@ namespace ARPG.Controllers
         {
 
             ViewBag.BookID = Request.Query["bookID"];
-            int bookId = ViewBag.BookID;
+            int bookId = Int32.Parse(ViewBag.BookID+"");
             var book = await _context.Book.FirstAsync(b => b.Id == bookId);
+            _context.Entry(book).Reference(b => b.User);
             var user = await GetCurrentUserAsync();
 
             if (book.User?.Id != user.Id)
@@ -122,6 +123,7 @@ namespace ARPG.Controllers
             {
                 _context.Add(actionCreated);
                 var book = await _context.Book.FirstAsync(b => b.Id == bookID);
+                _context.Entry(book).Reference(b => b.User);
                 var user = await GetCurrentUserAsync();
 
                 if (book.User?.Id != user.Id)
@@ -175,12 +177,15 @@ namespace ARPG.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Models.Action actionEdit)
         {
+            var action = await _context.Action.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+            var book = await _context.Book.FindAsync(action.BookId);
+            _context.Entry(book).Reference(b => b.User);
             var user = await GetCurrentUserAsync();
-
-            if (actionEdit.Book.User.Id != user.Id)
+            if (book.User?.Id != user.Id)
             {
                 return Unauthorized();
             }
+
             if (id != actionEdit.Id)
             {
                 return NotFound();
@@ -190,7 +195,7 @@ namespace ARPG.Controllers
             {
                 try
                 {
-                    var action = await _context.Action.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+                    
                     //replace unchangable parameters
                     actionEdit.BookId = action.BookId;
                     _context.Update(actionEdit);
@@ -235,7 +240,7 @@ namespace ARPG.Controllers
             _context.Entry(book).Reference(b => b.User);
             var user = await GetCurrentUserAsync();
 
-            if (book.User.Id != user.Id)
+            if (book.User?.Id != user.Id)
             {
                 return Unauthorized();
             }
@@ -254,9 +259,11 @@ namespace ARPG.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var action = await _context.Action.FindAsync(id);
+            var book = await _context.Book.FindAsync(action.BookId);
+            _context.Entry(book).Reference(b => b.User);
             var user = await GetCurrentUserAsync();
 
-            if (action.Book.User.Id != user.Id)
+            if (book.User.Id != user.Id)
             {
                 return Unauthorized();
             }
