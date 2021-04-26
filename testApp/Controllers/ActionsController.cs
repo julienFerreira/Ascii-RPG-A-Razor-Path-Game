@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Http;
 using ARPG.Models;
 using ARPG.Models.Data;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using ARPG.Areas.Identity;
 
 namespace ARPG.Controllers
 {
@@ -19,22 +22,34 @@ namespace ARPG.Controllers
         private readonly string finalMessageLoose = @"Sadly, you have no healthpoint left. 
                 You gather what courage you have left and leave without your dignity. Try again ?";
 
-        public ActionsController(ARPGContext context)
+        public ActionsController(ARPGContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
-        
+        private readonly UserManager<User> _userManager;
+        private Task<User> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
+
 
         // GET: Actions/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [Authorize]
+        [HttpGet("Books/{bookId}/Actions/{actionNumber}")]
+        public async Task<IActionResult> Details([FromRoute]int? bookId, [FromRoute]int? actionNumber)
         {
-            if (id == null)
+            if (actionNumber == null || bookId == null)
             {
                 return NotFound();
             }
 
             var action = await _context.Action
-                .FirstOrDefaultAsync(m => m.ActionNumber == id);
+                .FirstOrDefaultAsync(m => (m.ActionNumber == actionNumber && m.BookId == bookId));
+            var user = await GetCurrentUserAsync();
+
+            if (action.Book.User.Id != user.Id)
+            {
+                return Unauthorized();
+            }
+
             if (action == null)
             {
                 return NotFound();
@@ -51,7 +66,7 @@ namespace ARPG.Controllers
 
             //Get HP from session, default at base healthpoint
             int healthPoint;
-            if (id == 1)
+            if (actionNumber == 1)
             {
                 //Fist view of a book - the first page always go to max hitpoints
                 healthPoint = BASE_HEALTHPOINT;
@@ -80,15 +95,27 @@ namespace ARPG.Controllers
         }
 
         // GET: Actions/Create
-        public IActionResult Create(int id)
+        [Authorize]
+        public async Task<ActionResult> Create(int id)
         {
+
             ViewBag.BookID = Request.Query["bookID"];
+            int bookId = Int32.Parse(ViewBag.BookID+"");
+            var book = await _context.Book.FirstAsync(b => b.Id == bookId);
+            _context.Entry(book).Reference(b => b.User);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             return View();
         }
 
         // POST: Actions/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Models.Action actionCreated,int bookID)
@@ -97,10 +124,20 @@ namespace ARPG.Controllers
             {
                 _context.Add(actionCreated);
                 var book = await _context.Book.FirstAsync(b => b.Id == bookID);
+                _context.Entry(book).Reference(b => b.User);
+                var user = await GetCurrentUserAsync();
+
+                if (book.User?.Id != user.Id)
+                {
+                    return Unauthorized();
+                }
+
+
                 //Action created : The book is not valid anymore and has to be re-verified
                 book.IsValid = false;
                 _context.Update(book);
                 //Assign action to book
+
                 actionCreated.Book = book;
                 //Save both changes
                 await _context.SaveChangesAsync();
@@ -116,6 +153,7 @@ namespace ARPG.Controllers
         }
 
         // GET: Actions/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -124,6 +162,14 @@ namespace ARPG.Controllers
             }
 
             var action = await _context.Action.FindAsync(id);
+            var book = await _context.Book.FindAsync(action.BookId);
+            _context.Entry(book).Reference(b => b.User);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             if (action == null)
             {
                 return NotFound();
@@ -134,10 +180,20 @@ namespace ARPG.Controllers
         // POST: Actions/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Models.Action actionEdit)
         {
+            var action = await _context.Action.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+            var book = await _context.Book.FindAsync(action.BookId);
+            _context.Entry(book).Reference(b => b.User);
+            var user = await GetCurrentUserAsync();
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
+
             if (id != actionEdit.Id)
             {
                 return NotFound();
@@ -147,7 +203,7 @@ namespace ARPG.Controllers
             {
                 try
                 {
-                    var action = await _context.Action.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+                    
                     //replace unchangable parameters
                     actionEdit.BookId = action.BookId;
                     _context.Update(actionEdit);
@@ -183,6 +239,7 @@ namespace ARPG.Controllers
         }
 
         // GET: Actions/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -192,6 +249,14 @@ namespace ARPG.Controllers
 
             var action = await _context.Action
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var book = await _context.Book.FindAsync(action.BookId);
+            _context.Entry(book).Reference(b => b.User);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             if (action == null)
             {
                 return NotFound();
@@ -201,11 +266,20 @@ namespace ARPG.Controllers
         }
 
         // POST: Actions/Delete/5
+        [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var action = await _context.Action.FindAsync(id);
+            var book = await _context.Book.FindAsync(action.BookId);
+            _context.Entry(book).Reference(b => b.User);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             _context.Action.Remove(action);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

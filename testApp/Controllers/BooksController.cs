@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ARPG.Models;
 using ARPG.Models.Data;
+using Microsoft.AspNetCore.Identity;
+using ARPG.Areas.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Action = ARPG.Models.Action;
 
 
@@ -16,16 +19,29 @@ namespace ARPG.Controllers
     {
         private readonly ARPGContext _context;
 
-        public BooksController(ARPGContext context)
+        public BooksController(ARPGContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
+        private readonly UserManager<User> _userManager;
+        private Task<User> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
+
+        // GET : Library
+        public async Task<IActionResult> Library()
+        {
+            var books = _context.Book.Where(b => b.IsValid);
+            return View(books);
+        }
         // GET: Books
+        [Authorize]
         public async Task<IActionResult> Index()
         {
-            
-            return View(await _context.Book.ToListAsync());
+            var user = await GetCurrentUserAsync();
+            await _context.Entry(user).Collection(u => u.Books).LoadAsync();
+
+            return View(user.Books);
         }
 
         public async Task<IActionResult> Validate(int? id)
@@ -160,8 +176,9 @@ namespace ARPG.Controllers
             return isActionValid;
         }
 
-    // GET: Books/Details/5
-    public async Task<IActionResult> Details(int? id)
+        [Authorize]
+        // GET: Books/Details/5
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -170,6 +187,12 @@ namespace ARPG.Controllers
 
             var book = await _context.Book
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var user = await GetCurrentUserAsync();
+
+            if(book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
 
             await _context.Entry(book).Collection(b => b.Actions).LoadAsync();
             if (book == null)
@@ -181,6 +204,7 @@ namespace ARPG.Controllers
         }
 
         // GET: Books/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -189,12 +213,15 @@ namespace ARPG.Controllers
         // POST: Books/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Description,IsValid")] Book book)
         {
             if (ModelState.IsValid)
             {
+                var user = await GetCurrentUserAsync();
+                book.User = user;
                 _context.Add(book);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -203,6 +230,7 @@ namespace ARPG.Controllers
         }
 
         // GET: Books/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -211,6 +239,12 @@ namespace ARPG.Controllers
             }
 
             var book = await _context.Book.FindAsync(id);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             if (book == null)
             {
                 return NotFound();
@@ -221,6 +255,7 @@ namespace ARPG.Controllers
         // POST: Books/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,IsValid")] Book book)
@@ -228,6 +263,13 @@ namespace ARPG.Controllers
             if (id != book.Id)
             {
                 return NotFound();
+            }
+            var currentBook = await _context.Book.AsNoTracking().Include(b=>b.User).FirstAsync(b => book.Id==b.Id );
+            //_context.Entry(currentBook).Reference(b => b.User);
+            var user = await GetCurrentUserAsync();
+            if (currentBook.User?.Id != user.Id)
+            {
+                return Unauthorized();
             }
 
             if (ModelState.IsValid)
@@ -254,6 +296,7 @@ namespace ARPG.Controllers
         }
 
         // GET: Books/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -263,6 +306,13 @@ namespace ARPG.Controllers
 
             var book = await _context.Book
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
+
             if (book == null)
             {
                 return NotFound();
@@ -273,10 +323,18 @@ namespace ARPG.Controllers
 
         // POST: Books/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+
             var book = await _context.Book.FindAsync(id);
+            var user = await GetCurrentUserAsync();
+
+            if (book.User?.Id != user.Id)
+            {
+                return Unauthorized();
+            }
             _context.Book.Remove(book);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
