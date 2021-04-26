@@ -11,14 +11,18 @@
 
     <hr />
     <div class="container">
-        <div class="card">
+        <div class="card" ¨>
             <div class="card-header">
                 <p>
                     @Html.DisplayFor(model => model.ActionMessage)
+                    <div class="row float-right align-items-center justify-content-center">
+                        <span class="mx-1"> Healthpoint : </span>
+                        <div class="progress d-inline" id="progress-hp" style="width:100px; background-color: darkgray;">
+                            <div class="progress-bar @(ViewBag.ratio > 75 ? "bg-success" : ViewBag.ratio > 25 ? "bg-warning" : "bg-danger")" style="width : @(ViewBag.ratio)%;" role="progressbar" aria-valuenow="@ViewBag.ratio" aria-valuemin="0" aria-valuemax="100"> @ViewBag.hp / @ViewBag.maxHP </div>
+                        </div>
+                    </div>
                 </p>
-                <div class="float-right">
-                    HP : @ViewBag.hp / @ViewBag.maxHP
-                </div>
+                    
             </div>
             <div class="card-body d-flex flex-row justify-content-around">
                 @if (Model.GetType().GetProperty("SuccessorMessage1") != null)

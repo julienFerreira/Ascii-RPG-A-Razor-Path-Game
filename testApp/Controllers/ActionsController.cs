@@ -15,7 +15,7 @@ namespace ARPG.Controllers
     public class ActionsController : Controller
     {
         private readonly ARPGContext _context;
-        private readonly int BASE_HEALTHPOINT = 10;
+        private readonly int BASE_HEALTHPOINT = 50;
         private readonly string finalMessageLoose = @"Sadly, you have no healthpoint left. 
                 You gather what courage you have left and leave without your dignity. Try again ?";
 
@@ -76,6 +76,7 @@ namespace ARPG.Controllers
 
             ViewBag.hp = healthPoint;
             ViewBag.maxHP = BASE_HEALTHPOINT;
+            ViewBag.ratio = (healthPoint >= 0 ? 100*((float)healthPoint / BASE_HEALTHPOINT) : 0); //avoid negative value for progressbar
             return View(action);
         }
 
