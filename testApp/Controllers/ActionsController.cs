@@ -32,7 +32,6 @@ namespace ARPG.Controllers
 
 
         // GET: Actions/Details/5
-        [Authorize]
         [HttpGet("Books/{bookId}/Actions/{actionNumber}")]
         public async Task<IActionResult> Details([FromRoute]int? bookId, [FromRoute]int? actionNumber)
         {
@@ -43,12 +42,7 @@ namespace ARPG.Controllers
 
             var action = await _context.Action
                 .FirstOrDefaultAsync(m => (m.ActionNumber == actionNumber && m.BookId == bookId));
-            var user = await GetCurrentUserAsync();
 
-            if (action.Book.User.Id != user.Id)
-            {
-                return Unauthorized();
-            }
 
             if (action == null)
             {
@@ -208,7 +202,6 @@ namespace ARPG.Controllers
                     actionEdit.BookId = action.BookId;
                     _context.Update(actionEdit);
                     //Action updated : The book is not valid anymore and has to be re-verified
-                    var book = await _context.Book.FindAsync(actionEdit.BookId);
                     book.IsValid = false;
                     _context.Update(book);
                     //Save both changes
