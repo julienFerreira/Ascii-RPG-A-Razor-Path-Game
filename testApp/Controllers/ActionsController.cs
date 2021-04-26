@@ -72,7 +72,8 @@ namespace ARPG.Controllers
                 healthPoint = BASE_HEALTHPOINT;
             } else {
                 healthPoint = HttpContext.Session.GetInt32("hp") ?? BASE_HEALTHPOINT;
-                healthPoint += action.HPGains;//TODO LINK TO ACTION HEALTH
+                if(action.HPGains.HasValue)
+                    healthPoint += action.HPGains.Value;//TODO LINK TO ACTION HEALTH
                 if (healthPoint > BASE_HEALTHPOINT)
                     healthPoint = BASE_HEALTHPOINT;
 
@@ -131,7 +132,14 @@ namespace ARPG.Controllers
                     return Unauthorized();
                 }
 
+
+                //Action created : The book is not valid anymore and has to be re-verified
+                book.IsValid = false;
+                _context.Update(book);
+                //Assign action to book
+
                 actionCreated.Book = book;
+                //Save both changes
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(BooksController.Details), new RouteValueDictionary(
                      new { 
@@ -199,6 +207,11 @@ namespace ARPG.Controllers
                     //replace unchangable parameters
                     actionEdit.BookId = action.BookId;
                     _context.Update(actionEdit);
+                    //Action updated : The book is not valid anymore and has to be re-verified
+                    var book = await _context.Book.FindAsync(actionEdit.BookId);
+                    book.IsValid = false;
+                    _context.Update(book);
+                    //Save both changes
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
