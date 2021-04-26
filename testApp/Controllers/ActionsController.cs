@@ -268,6 +268,9 @@ namespace ARPG.Controllers
             var action = await _context.Action.FindAsync(id);
             var book = await _context.Book.FindAsync(action.BookId);
             _context.Entry(book).Reference(b => b.User);
+            //Action updated : The book is not valid anymore and has to be re-verified
+            book.IsValid = false;
+            _context.Update(book);
             var user = await GetCurrentUserAsync();
 
             if (book.User.Id != user.Id)
