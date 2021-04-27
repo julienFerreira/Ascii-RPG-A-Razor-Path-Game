@@ -146,13 +146,15 @@ namespace ARPG.Services
             bool isBookValid = true;
             IList<Action> actions = book.Actions.ToList();
 
+            //can't validate if there is not exactly one starting point, shouldn't happen after structural verification
             var initialActionQuery = actions.Where(a => a.ActionNumber == 1);
             if (initialActionQuery == null || initialActionQuery.Count() != 1)
-                return false; //can't validate if there is not exactly one starting point
+                return false; 
 
             ActionChainer initialChainer = new ActionChainer(initialActionQuery.Single());
-            IList<ActionChainer> actionChain = new List<ActionChainer>();
-            actionChain.Add(initialChainer);
+            IList<ActionChainer> actionChain = new List<ActionChainer> {
+                initialChainer,
+            };
             DiscoverPaths(initialChainer, actionChain, actions);
 
             foreach (ActionChainer chainer in actionChain)
@@ -167,8 +169,6 @@ namespace ARPG.Services
                 }
             }
 
-            //Go from action 1 and ignore every other action not linked to 1
-            //As the client will not see them
             return isBookValid;
         }
 
@@ -197,16 +197,18 @@ namespace ARPG.Services
                 childrenChainer.Parents.Add(parent); //declare that this chainer now has one more parent
                 if (childrenChainer.IsVerified)
                 {
-                    //already verified - we are good to go. Otherwise we could be called when the chainer is verified
+                    //already verified - we are good to go. Otherwise we could be called later when the chainer is verified
                     ValidateChildrens(parent);
                 }
             }
             else
             {
-                //case : chainers does not exist
+                //case : chainers does not exist. Fetch action
                 var action = actions.Where(a => a.ActionNumber == next).Single();
+                //create chainer, add it to the list
                 var actionChainer = new ActionChainer(action, parent);
                 chainList.Add(actionChainer);
+                //Discover paths on the newly created chainer, keeping exploring the book
                 DiscoverPaths(actionChainer, chainList, actions);
             }
         }

@@ -55,7 +55,7 @@ namespace ARPG.Controllers
                 return NotFound();
 
             //Call the book validator to validate the book
-            bool isBookValid = BookValidator.Validate(book, out List<string> errors, out List<String> warnings);
+            bool isBookValid = BookValidator.Validate(book, out List<string> warnings, out List<String> errors);
 
             //save book validity
             book.IsValid = isBookValid;
