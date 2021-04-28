@@ -76,6 +76,10 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 <script>
+    window.onload = function () {
+        onSelectChange();
+    };
+
     function onSelectChange() {
         toggle(selectTerminal.value);
     }

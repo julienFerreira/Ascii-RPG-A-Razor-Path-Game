@@ -31,7 +31,7 @@ namespace ARPG.Controllers
         // GET : Library
         public async Task<IActionResult> Library()
         {
-            var books = _context.Book.Where(b => b.IsValid);
+            var books = _context.Book.Where(b => b.IsValid).Include(b => b.User);
             return View(books);
         }
         // GET: Books

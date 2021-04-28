@@ -10,12 +10,12 @@ namespace ARPG.Services
     {
         /// <summary>
         /// Entry point of the book validator
-        /// Entirely validate a book, structure & paths
+        /// Entirely validate a book, structure then paths
         /// </summary>
-        /// <param name="book"></param>
-        /// <param name="warnings"></param>
-        /// <param name="errors"></param>
-        /// <returns></returns>
+        /// <param name="book">The book to validate</param>
+        /// <param name="warnings">The list of warnings associated with this book</param>
+        /// <param name="errors">The list of errors associated with this book</param>
+        /// <returns>Wether the book is validated or not</returns>
         public static bool Validate(Book book, out List<string> warnings, out List<String> errors)
         {
             //init result var
@@ -27,20 +27,28 @@ namespace ARPG.Services
             if (isBookValid)
             {
                 isBookValid = ValidatePaths(book, out List<String> pathErrors);
-                errors.AddRange(pathErrors);
+                errors.AddRange(pathErrors); //errors are supposed to be empty if the book is valid, but better concat then replace
             }
 
             return isBookValid;
         }
 
+        /// <summary>
+        /// Validate the structural integrity of a book
+        /// Tries to be as tolerant as possible with warnings that are not fatal to user experience
+        /// </summary>
+        /// <param name="book">The book to analyse</param>
+        /// <param name="warnings">The warnings found on the book</param>
+        /// <param name="errors">The errors found on the boo</param>
+        /// <returns>Wether the book is structurally valid</returns>
         private static bool ValidateBook(Book book, out List<String> warnings, out List<String> errors)
         {
             warnings = new List<string>();
             errors = new List<string>();
 
             bool isBookValid = true;
-            List<int> visited = new List<int>();
-            ISet<int> linkedActions = new HashSet<int>();
+            IList<int> visited = new List<int>();
+            ISet<int> linkedActions = new HashSet<int>(); //set avoids repetition of linked action numbers
             List<Action> actions = book.Actions.ToList();
 
             foreach (Action action in actions)
@@ -52,12 +60,15 @@ namespace ARPG.Services
                     errors.Add($"You have a duplicate ! action number {action.ActionNumber} is used multiple times, fix this");
                 }
 
+                //add successors in linked actions list
                 if (action.SuccessorCode1.HasValue)
                     linkedActions.Add(action.SuccessorCode1.Value);
                 if (action.SuccessorCode2.HasValue)
                     linkedActions.Add(action.SuccessorCode2.Value);
 
+                //add action to visited
                 visited.Add(action.ActionNumber);
+                //verify the action itself
                 if (!IsActionValid(action, actions, out List<String> errorsAction, out List<String> warningsAction))
                     isBookValid = false;
 
@@ -65,7 +76,7 @@ namespace ARPG.Services
                 warnings.AddRange(warningsAction);
             }
 
-            // Lastly : Check that initial action is valid !
+            // Check that initial action is present !
             if (actions.Find(a => a.ActionNumber == 1) == null)
             {
                 errors.Add("Your book does not contain the initial action with actionnumber at 1 !");
@@ -84,6 +95,15 @@ namespace ARPG.Services
             return isBookValid;
         }
 
+        /// <summary>
+        /// Verifies if a particular action is valid.
+        /// Tries to be as tolerant as possible, throw warning when possible
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="actions"></param>
+        /// <param name="errorsAction"></param>
+        /// <param name="warningsAction"></param>
+        /// <returns></returns>
         private static bool IsActionValid(Action action, List<Action> actions, out List<String> errorsAction, out List<String> warningsAction)
         {
             bool isActionValid = true;
@@ -155,6 +175,7 @@ namespace ARPG.Services
             IList<ActionChainer> actionChain = new List<ActionChainer> {
                 initialChainer,
             };
+            //call the recursive function that create the action chains according to the paths of the book
             DiscoverPaths(initialChainer, actionChain, actions);
 
             foreach (ActionChainer chainer in actionChain)
@@ -171,6 +192,52 @@ namespace ARPG.Services
 
             return isBookValid;
         }
+        
+        /*
+        private static void FindFailedPaths(ActionChainer FailingChainer, out List<List<int>> paths)
+        {
+            List<int> initialPath = new List<int>();
+            paths = new List<List<int>>()
+            {
+                initialPath
+            };
+            RecursiveFailedPathsSearch(FailingChainer, paths, initialPath);
+        }
+
+        private static void RecursiveFailedPathsSearch(ActionChainer FailingChainer, List<List<int>> paths, List<int> currentPath)
+        {
+            if (currentPath.Contains(FailingChainer.Action.ActionNumber))
+                return;
+
+            int nextPathCount = FailingChainer.Parents.Where(a => a.IsVerified == false).Count();
+            List<int> initialPathSnapshot = null;
+            if (nextPathCount > 1)
+            {
+                initialPathSnapshot = new List<int>(currentPath);
+            }
+
+            bool doSeparate = false; 
+            foreach (ActionChainer parent in FailingChainer.Parents)
+            {
+                if (!parent.IsVerified)
+                {
+                    List<int> pathToAction;
+                    //First activation - continue current path
+                    if (!doSeparate)
+                    {
+                        doSeparate = true;
+                        pathToAction = currentPath;
+                    } else //already activated - create a new path
+                    {
+                        pathToAction = new List<int>(initialPathSnapshot);
+                        paths.Add(pathToAction);
+                    }
+
+                    pathToAction.Add(FailingChainer.Action.ActionNumber);
+                    RecursiveFailedPathsSearch(parent, paths, pathToAction);
+                }
+            }
+        }*/
 
         private static void DiscoverPaths(ActionChainer node, IList<ActionChainer> chainList, IList<Action> actions)
         {
@@ -194,7 +261,7 @@ namespace ARPG.Services
             {
                 //case : chainer exists, action already visited (avoid looping)
                 ActionChainer childrenChainer = chainerQuery.Single();
-                childrenChainer.Parents.Add(parent); //declare that this chainer now has one more parent
+                childrenChainer.AddParent(parent); //declare that this chainer now has one more parent
                 if (childrenChainer.IsVerified)
                 {
                     //already verified - we are good to go. Otherwise we could be called later when the chainer is verified
