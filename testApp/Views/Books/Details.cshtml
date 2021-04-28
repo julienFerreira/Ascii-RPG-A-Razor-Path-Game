@@ -19,23 +19,38 @@
     </p>
 
 }
-@if (ViewBag.warnings != null)
+@if (ViewBag.warnings != null && ViewBag.warnings.Count > 0)
 {
-    foreach (var warning in ViewBag.warnings)
-    {
-        <p class="alert-warning">
-            @warning
-        </p>
-    }
+    <p>
+        <button class="btn btn-warning" type="button" data-toggle="collapse" data-target="#collapse-warning" aria-expanded="false" aria-controls="collapseExample">
+            Show warnings
+        </button>
+        <div class="collapse" id="collapse-warning">
+            @foreach (var warning in ViewBag.warnings)
+            {
+                <p class="alert-warning m-1">
+                    @warning
+                </p>
+            }
+        </div>
+    </p>
 }
-@if (ViewBag.errors != null)
+
+@if (ViewBag.errors != null && ViewBag.errors.Count > 0)
 {
-    foreach (var error in ViewBag.errors)
-    {
-        <p class="alert-danger">
-            @error
-        </p>
-    }
+    <p>
+        <button class="btn btn-danger" type="button" data-toggle="collapse" data-target="#collapse-danger" aria-expanded="false" aria-controls="collapseExample">
+            Show errors
+        </button>
+        <div class="collapse" id="collapse-danger">
+            @foreach (var error in ViewBag.errors)
+            {
+                <p class="alert-danger m-1">
+                    @error
+                </p>
+            }
+        </div>
+    </p>
 }
 
 <div>
@@ -87,22 +102,22 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.ActionMessage)
-                        <div class="badge badge-secondary float-right">
+                        <div class="badge badge-secondary">
                             @Html.DisplayFor(modelItem => item.ActionNumber)
                         </div>
+                        @Html.DisplayFor(modelItem => item.ActionMessage)
                     </td>
                     <td>
+                        <div class="badge badge-@(item.IsWon == null ? "secondary" : item.IsWon.Value ? "success" : "danger")">
+                            @(item.IsWon == null ? item.SuccessorCode1.ToString() : item.IsWon.Value ? "win" : "loose")
+                        </div>
                         @Html.DisplayFor(modelItem => item.SuccessorMessage1)
-                        <div class="badge badge-secondary float-right">
-                            @Html.DisplayFor(modelItem => item.SuccessorCode1)
-                        </div>
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.SuccessorMessage2)
-                        <div class="badge badge-secondary float-right">
-                            @Html.DisplayFor(modelItem => item.SuccessorCode2)
+                        <div class="badge badge-@(item.IsWon == null ? "secondary" : item.IsWon.Value ? "success" : "danger")">
+                            @(item.IsWon == null ? item.SuccessorCode1.ToString() : item.IsWon.Value ? "win" : "loose")
                         </div>
+                        @Html.DisplayFor(modelItem => item.SuccessorMessage2)
                     </td>
                     <td>
                         <a class="btn btn-outline-primary" asp-controller="Actions" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

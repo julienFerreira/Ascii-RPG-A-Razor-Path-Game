@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using ARPG.Areas.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Action = ARPG.Models.Action;
-
+using ARPG.Services;
 
 namespace ARPG.Controllers
 {
@@ -31,7 +31,7 @@ namespace ARPG.Controllers
         // GET : Library
         public async Task<IActionResult> Library()
         {
-            var books = _context.Book.Where(b => b.IsValid);
+            var books = _context.Book.Where(b => b.IsValid).Include(b => b.User);
             return View(books);
         }
         // GET: Books
@@ -50,131 +50,26 @@ namespace ARPG.Controllers
                 return NotFound();
 
             //fetch book with actions
-            var book = await _context.Book.FirstOrDefaultAsync(m => m.Id == id);
-            await _context.Entry(book).Collection(b => b.Actions).LoadAsync();
-
+            var book = await _context.Book.Include(b => b.Actions).Where(b => b.Id == id).SingleOrDefaultAsync();
             if (book == null)
-            {
                 return NotFound();
-            }
 
+            //Call the book validator to validate the book
+            bool isBookValid = BookValidator.Validate(book, out List<string> warnings, out List<String> errors);
 
-            book.IsValid = ValidateBook(book, out List<String> warnings, out List<String> errors);
+            //save book validity
+            book.IsValid = isBookValid;
+            _context.Update(book);
+            await _context.SaveChangesAsync();
 
+            //pass variables to view
             ViewBag.validated = book.IsValid;
             ViewBag.errors = errors;
             ViewBag.warnings = warnings;
 
-            //save book validity
-            _context.Update(book);
-            await _context.SaveChangesAsync();
-
             return View("Details", book);
         }
 
-        public bool ValidateBook(Book book, out List<String> warnings, out List<String> errors)
-        {
-            warnings = new List<string>();
-            errors = new List<string>();
-
-            bool isBookValid = true;
-            List<int> visited = new List<int>();
-            ISet<int> linkedActions = new HashSet<int>();
-            List<Action> actions = book.Actions.ToList();
-
-            foreach (Action action in actions)
-            {
-                //verify duplicates
-                if (visited.Contains(action.ActionNumber))
-                {
-                    isBookValid = false;
-                    errors.Add($"You have a duplicate ! action number {action.ActionNumber} is used multiple times, fix this");
-                }
-
-                if (action.SuccessorCode1.HasValue)
-                    linkedActions.Add(action.SuccessorCode1.Value);
-                if (action.SuccessorCode2.HasValue)
-                    linkedActions.Add(action.SuccessorCode2.Value);
-
-                visited.Add(action.ActionNumber);
-                if (!IsActionValid(action, actions, out List<String> errorsAction, out List<String> warningsAction))
-                    isBookValid = false;
-
-                errors.AddRange(errorsAction);
-                warnings.AddRange(warningsAction);
-            }
-
-            // Lastly : Check that initial action is valid !
-            if(actions.Find(a => a.ActionNumber == 1) == null)
-            {
-                errors.Add("Your book does not contain the initial action with actionnumber at 1 !");
-                isBookValid = false;
-            }
-
-            //Verify that each action is linked (if an action is not linked, it is a warning because the action is unreachable but the book is not broken)
-            foreach(int actionNumber in visited)
-            {
-                if (!linkedActions.Contains(actionNumber))
-                {
-                    warnings.Add($"Action {actionNumber} is not reachable because no other action is linked to it");
-                }
-            }
-
-            return isBookValid;
-        }
-
-        public bool IsActionValid(Action action, List<Action> actions, out List<String> errorsAction, out List<String> warningsAction)
-        {
-            bool isActionValid = true;
-            errorsAction = new List<string>();
-            warningsAction = new List<string>();
-            
-            
-            if(String.IsNullOrEmpty(action.ActionMessage))
-            {
-                warningsAction.Add($"action {action.ActionNumber} has no message, is it normal ?");
-            }
-
-            if (action.IsWon != null)
-            {
-                //Action is terminal
-                if(action.SuccessorCode1 != null || action.SuccessorCode2 != null || action.SuccessorMessage1 != null || action.SuccessorMessage2 != null)
-                {
-                    warningsAction.Add($"action {action.ActionNumber} (message : {action.ActionMessage}) is terminal but has successor defined, it will never be used");
-                }
-
-                if(action.HPGains != null)
-                {
-                    warningsAction.Add($"action {action.ActionNumber} is terminal but has an HP gains that will never be used");
-                }
-            }
-            else { 
-                //Action is not terminal
-                //verify successor existence and successor existence in book - a non terminal action must have two successors
-                if(action.SuccessorCode1 == null)
-                {
-                    errorsAction.Add($"Your action {action.ActionNumber} (message : {action.ActionMessage}) has successor 1 that is null on a non terminal acton");
-                    isActionValid = false;
-                }
-                else if ( !actions.Where(a => a.ActionNumber == action.SuccessorCode1).Any() )
-                {
-                    errorsAction.Add($"Your action {action.ActionNumber} (message : {action.ActionMessage}) has successor 1 that does not exists in the books ! ({action.SuccessorCode1})");
-                    isActionValid = false;
-                }
-
-                if (action.SuccessorCode2 == null)
-                {
-                    errorsAction.Add($"Your action {action.ActionNumber} (message : {action.ActionMessage}) has successor 2 that is null on a non terminal action");
-                    isActionValid = false;
-                } else if (!actions.Where(a => a.ActionNumber == action.SuccessorCode2).Any())
-                {
-                    errorsAction.Add($"Your action {action.ActionNumber} (message : {action.ActionMessage}) has successor 2 that does not exists in the books ! ({action.SuccessorCode2})");
-                    isActionValid = false;
-                }
-            }
-
-            return isActionValid;
-        }
 
         [Authorize]
         // GET: Books/Details/5
