@@ -8,7 +8,7 @@ namespace ARPG.Models
 {
     public class Book
     {
-        public Book(){}
+        public Book() { }
 
         public int Id { get; set; }
 

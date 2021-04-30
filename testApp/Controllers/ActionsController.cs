@@ -30,7 +30,7 @@ namespace ARPG.Controllers
 
         // GET: Actions/Details/5
         [HttpGet("Books/{bookId}/Actions/{actionNumber}")]
-        public async Task<IActionResult> Details([FromRoute]int? bookId, [FromRoute]int? actionNumber)
+        public async Task<IActionResult> Details([FromRoute] int? bookId, [FromRoute] int? actionNumber)
         {
             if (actionNumber == null || bookId == null)
             {
@@ -39,7 +39,6 @@ namespace ARPG.Controllers
 
             var action = await _context.Action
                 .FirstOrDefaultAsync(m => (m.ActionNumber == actionNumber && m.BookId == bookId));
-
 
             if (action == null)
             {
@@ -61,9 +60,11 @@ namespace ARPG.Controllers
             {
                 //Fist view of a book - the first page always go to max hitpoints
                 healthPoint = BASE_HEALTHPOINT;
-            } else {
+            }
+            else
+            {
                 healthPoint = HttpContext.Session.GetInt32("hp") ?? BASE_HEALTHPOINT;
-                if(action.HPGains.HasValue)
+                if (action.HPGains.HasValue)
                     healthPoint += action.HPGains.Value;//TODO LINK TO ACTION HEALTH
                 if (healthPoint > BASE_HEALTHPOINT)
                     healthPoint = BASE_HEALTHPOINT;
@@ -82,7 +83,7 @@ namespace ARPG.Controllers
 
             ViewBag.hp = healthPoint;
             ViewBag.maxHP = BASE_HEALTHPOINT;
-            ViewBag.ratio = (healthPoint >= 0 ? 100*((float)healthPoint / BASE_HEALTHPOINT) : 0); //avoid negative value for progressbar
+            ViewBag.ratio = (healthPoint >= 0 ? 100 * ((float)healthPoint / BASE_HEALTHPOINT) : 0); //avoid negative value for progressbar
             return View(action);
         }
 
@@ -90,9 +91,8 @@ namespace ARPG.Controllers
         [Authorize]
         public async Task<ActionResult> Create(int id)
         {
-
             ViewBag.BookID = Request.Query["bookID"];
-            int bookId = Int32.Parse(ViewBag.BookID+"");
+            int bookId = Int32.Parse(ViewBag.BookID + "");
             var book = await _context.Book.FirstAsync(b => b.Id == bookId);
             _context.Entry(book).Reference(b => b.User);
             var user = await GetCurrentUserAsync();
@@ -110,7 +110,7 @@ namespace ARPG.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Models.Action actionCreated,int bookID)
+        public async Task<IActionResult> Create(Models.Action actionCreated, int bookID)
         {
             if (ModelState.IsValid)
             {
@@ -123,25 +123,23 @@ namespace ARPG.Controllers
                 {
                     return Unauthorized();
                 }
-
-
                 //Action created : The book is not valid anymore and has to be re-verified
                 book.IsValid = false;
                 _context.Update(book);
-                //Assign action to book
 
                 actionCreated.Book = book;
                 //Save both changes
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(BooksController.Details), new RouteValueDictionary(
-                     new { 
-                         controller = "Books", 
-                         action = nameof(BooksController.Details), 
-                         Id = bookID }
+                     new
+                     {
+                         controller = "Books",
+                         action = nameof(BooksController.Details),
+                         Id = bookID
+                     }
                      ));
             }
             return View(actionCreated);
-
         }
 
         // GET: Actions/Edit/5
@@ -195,7 +193,6 @@ namespace ARPG.Controllers
             {
                 try
                 {
-                    
                     //replace unchangable parameters
                     actionEdit.BookId = action.BookId;
                     _context.Update(actionEdit);
@@ -216,7 +213,6 @@ namespace ARPG.Controllers
                         throw;
                     }
                 }
-                //return RedirectToAction(nameof(Index));
                 return RedirectToAction(nameof(BooksController.Details), new RouteValueDictionary(
                      new
                      {
@@ -225,7 +221,7 @@ namespace ARPG.Controllers
                          Id = actionEdit.BookId
                      }
                      ));
-            } 
+            }
             return View(actionEdit);
         }
 
@@ -276,9 +272,15 @@ namespace ARPG.Controllers
             }
             _context.Action.Remove(action);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(BooksController.Details), new RouteValueDictionary(
+                     new
+                     {
+                         controller = "Books",
+                         action = nameof(BooksController.Details),
+                         Id = book.Id
+                     }
+                     ));
         }
-
         private bool ActionExists(int id)
         {
             return _context.Action.Any(e => e.Id == id);
