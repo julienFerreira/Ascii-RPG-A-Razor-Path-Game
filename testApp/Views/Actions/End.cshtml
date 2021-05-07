@@ -1,0 +1,31 @@
+﻿@model ARPG.Models.Action
+
+@{
+    ViewData["Title"] = "End";
+}
+
+<h1>End</h1>
+
+
+<div>
+    <h4>Action</h4>
+
+    <hr />
+    <div class="container">
+        <div class="card">
+            <div class="card-header text-center" style="color : @(ViewBag.win ? "green" : "red");">
+                @(ViewBag.win ? "Won" : "Lost")
+            </div>
+            <div class="card-body d-flex flex-column justify-content-around">
+                <p>@(ViewBag.message)</p>
+
+                <a class="d-block btn @(ViewBag.win ? "btn-success" : "btn-danger")" asp-controller="Actions" asp-action="Details" asp-route-bookId="@ViewBag.bookId" asp-route-actionNumber="1">
+                    @(ViewBag.win ? "Try again and discover all the different paths !" : "Try again, looser !")
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <a asp-controller="Books" asp-action="Index">Back to Books</a>
+</div>

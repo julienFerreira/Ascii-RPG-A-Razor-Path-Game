@@ -1,4 +1,4 @@
-﻿@model testApp.Models.Action
+﻿@model ARPG.Models.Action
 
 @{
     ViewData["Title"] = "Edit";
@@ -25,20 +25,34 @@
 
             <div class="form-group">
                 <label class="control-label">Action : </label>
-                <input asp-for="SuccessorMessage1" class="form-control" />
+                <input asp-for="SuccessorMessage1" class="form-control" id="sm1" />
 
                 <label class="control-label">Goes to action : </label>
-                <input asp-for="SuccessorCode1" type="number" min="1" class="form-control" />
+                <input asp-for="SuccessorCode1" type="number" min="1" class="form-control" id="sc1" />
 
                 <span asp-validation-for="SuccessorMessage1" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label class="control-label">Action : </label>
-                <input asp-for="SuccessorMessage2" class="form-control" />
+                <input asp-for="SuccessorMessage2" class="form-control" id="sm2" />
                 <label class="control-label">Goes to action : </label>
-                <input asp-for="SuccessorCode2" type="number" min="1" class="form-control" />
+                <input asp-for="SuccessorCode2" type="number" min="1" class="form-control" id="sc2" />
                 <span asp-validation-for="SuccessorMessage2" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Gains de HP : </label>
+                <input asp-for="HPGains" type="number" min="-10" max="10" step="1" class="form-control" id="hpGains" />
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Gains de HP : </label>
+                <select asp-for="IsWon" onchange="onSelectChange()" id="selectTerminal">
+                    <option value="@null" selected>No terminal</option>
+                    <option value="@true">Win</option>
+                    <option value="@false">Loose</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -49,9 +63,26 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-controller="Books" asp-action="Details" asp-route-id="@Model.BookId">Back to List</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        window.onload = function () {
+            onSelectChange();
+        };
+
+        function onSelectChange() {
+            toggle(selectTerminal.value);
+        }
+
+        function toggle(isenabled) {
+            sm1.disabled = isenabled;
+            sc1.disabled = isenabled;
+            sm2.disabled = isenabled;
+            sc2.disabled = isenabled;
+            hpGains.disabled = isenabled;
+        }
+    </script>
 }
