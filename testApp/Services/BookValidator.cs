@@ -169,7 +169,7 @@ namespace ARPG.Services
             //can't validate if there is not exactly one starting point, shouldn't happen after structural verification
             var initialActionQuery = actions.Where(a => a.ActionNumber == 1);
             if (initialActionQuery == null || initialActionQuery.Count() != 1)
-                return false; 
+                return false;
 
             ActionChainer initialChainer = new ActionChainer(initialActionQuery.Single());
             IList<ActionChainer> actionChain = new List<ActionChainer> {
@@ -192,7 +192,10 @@ namespace ARPG.Services
 
             return isBookValid;
         }
-        
+
+
+        //Try to validate error in failed path
+        #region
         /*
         private static void FindFailedPaths(ActionChainer FailingChainer, out List<List<int>> paths)
         {
@@ -238,6 +241,7 @@ namespace ARPG.Services
                 }
             }
         }*/
+        #endregion
 
         private static void DiscoverPaths(ActionChainer node, IList<ActionChainer> chainList, IList<Action> actions)
         {

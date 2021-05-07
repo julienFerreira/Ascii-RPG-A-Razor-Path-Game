@@ -25,24 +25,25 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                <p>Author : @Html.DisplayFor(modelItem => item.User.Email)</p>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsValid)
-            </td>
-            <td>
-                <a class="btn" asp-controller="Actions" asp-action="Details" asp-route-bookId="@item.Id" asp-route-actionNumber="1">Play</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    <p>Author : @Html.DisplayFor(modelItem => item.User.Email)</p>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsValid)
+                </td>
+                <td>
+                    <a class="btn" asp-controller="Actions" asp-action="Details" asp-route-bookId="@item.Id" asp-route-actionNumber="1">Play</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

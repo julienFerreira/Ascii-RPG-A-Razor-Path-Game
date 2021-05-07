@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ARPG.Models;
 using ARPG.Models.Data;
 using Microsoft.AspNetCore.Identity;
 using ARPG.Areas.Identity;
 using Microsoft.AspNetCore.Authorization;
-using Action = ARPG.Models.Action;
 using ARPG.Services;
 
 namespace ARPG.Controllers
@@ -84,7 +82,7 @@ namespace ARPG.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             var user = await GetCurrentUserAsync();
 
-            if(book.User?.Id != user.Id)
+            if (book.User?.Id != user.Id)
             {
                 return Unauthorized();
             }
@@ -94,7 +92,7 @@ namespace ARPG.Controllers
             {
                 return NotFound();
             }
-            
+
             return View(book);
         }
 
@@ -159,8 +157,7 @@ namespace ARPG.Controllers
             {
                 return NotFound();
             }
-            var currentBook = await _context.Book.AsNoTracking().Include(b=>b.User).FirstAsync(b => book.Id==b.Id );
-            //_context.Entry(currentBook).Reference(b => b.User);
+            var currentBook = await _context.Book.AsNoTracking().Include(b => b.User).FirstAsync(b => book.Id == b.Id);
             var user = await GetCurrentUserAsync();
             if (currentBook.User?.Id != user.Id)
             {
